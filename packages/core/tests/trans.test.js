@@ -1,12 +1,3 @@
-/**
- * TODO: Refactor this test code.
- * This test suite code is written just to check if code is working properly.
- * There is a better way to organize these code.
- *
- * Things that should be done:
- * 1) Test VueJS integration
- *
- */
 import { trans } from '../translator.js'
 const Lingua = {
     translations: {
@@ -14,9 +5,14 @@ const Lingua = {
             php: {
                 dashboard: 'Dashboard',
                 replace: 'Welcome, :user',
+                multi: ':a and :b',
                 settings: {
                     title: 'Settings',
                 }
+            },
+            json: {
+                'json_key': 'JSON Value',
+                'json_replace': 'Hello :name from JSON',
             }
         },
         pl: {
@@ -53,6 +49,22 @@ test("trans is translating key containing dot character", () => {
 
 test('trans is replacing key', () => {
     expect(trans('replace', { user: 'World' }, false, config)).toBe('Welcome, World')
+})
+
+test('trans returns the key when translation is missing', () => {
+    expect(trans('nonexistent', {}, false, config)).toBe('nonexistent')
+})
+
+test('trans looks up json namespace when key not in php', () => {
+    expect(trans('json_key', {}, false, config)).toBe('JSON Value')
+})
+
+test('trans supports replacements in json translations', () => {
+    expect(trans('json_replace', { name: 'World' }, false, config)).toBe('Hello World from JSON')
+})
+
+test('trans handles multiple replacements', () => {
+    expect(trans('multi', { a: 'foo', b: 'bar' }, false, config)).toBe('foo and bar')
 });
 
 // @deprecated This test does not make sense. Locale should be case sensitive. (can be en-US for example)

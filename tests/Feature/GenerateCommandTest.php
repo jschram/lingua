@@ -21,6 +21,8 @@ afterEach(function () {
     File::delete($this->langPath);
     File::delete($this->outputPath);
     File::delete(lang_path('uk.json'));
+    File::deleteDirectory(lang_path('fr'));
+    File::delete(lang_path('fr.json'));
 });
 
 test('it can compile php locale files', function () {
@@ -71,4 +73,31 @@ test('it can compile both php and json locale files for the same locale', functi
         // Verify JSON translations
         ->toContain('"welcome":"\u041b\u0430\u0441\u043a\u0430\u0432\u043e \u043f\u0440\u043e\u0441\u0438\u043c\u043e"')
         ->toContain('"nested":{"key":"\u0412\u043a\u043b\u0430\u0434\u0435\u043d\u0435 \u0437\u043d\u0430\u0447\u0435\u043d\u043d\u044f"');
+});
+
+test('it generates translations for a json only locale', function () {
+    File::put(lang_path('fr.json'), json_encode(['bonjour' => 'Bonjour']));
+
+    $this->artisan('lingua:generate', ['path' => $this->outputPath])
+        ->assertExitCode(0);
+
+    $content = File::get($this->outputPath);
+
+    expect($content)
+        ->toContain('"fr"')
+        ->toContain('"bonjour"')
+        ->toContain('"Bonjour"');
+});
+
+test('it generates translations for multiple locales', function () {
+    File::put(lang_path('fr.json'), json_encode(['bonjour' => 'Bonjour']));
+
+    $this->artisan('lingua:generate', ['path' => $this->outputPath])
+        ->assertExitCode(0);
+
+    $content = File::get($this->outputPath);
+
+    expect($content)
+        ->toContain('"uk"')
+        ->toContain('"fr"');
 });

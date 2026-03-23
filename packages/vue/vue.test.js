@@ -8,6 +8,10 @@ describe('VueJS translation integration', () => {
         php: {
           greeting: 'Hello, Vue!',
           welcome: 'Welcome, :user!',
+          nested: { label: 'Nested Label' },
+        },
+        json: {
+          'json_key': 'JSON Value',
         }
       },
       fr: {
@@ -32,6 +36,14 @@ describe('VueJS translation integration', () => {
 
   it('should translate for a different locale', () => {
     expect(trans('greeting', {}, false, { Lingua, locale: 'fr' })).toBe('Bonjour, Vue!');
+  });
+
+  it('should translate a nested key', () => {
+    expect(trans('nested.label', {}, false, { Lingua, locale: 'en' })).toBe('Nested Label');
+  });
+
+  it('should look up json namespace', () => {
+    expect(trans('json_key', {}, false, { Lingua, locale: 'en' })).toBe('JSON Value');
   });
 
   it('should handle pluralization', () => {

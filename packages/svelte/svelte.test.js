@@ -1,11 +1,11 @@
 import { get } from 'svelte/store';
-import { setLingua, trans, transChoice, currentLocale, linguaData } from './index.js';
+import { setLingua, trans, transChoice, __, currentLocale, linguaData } from './index.js';
 
 const mockLinguaData = {
   translations: {
     en: {
       php: { 'hello': 'Hello :name!', 'welcome': 'Welcome' },
-      json: { 'plural_test': 'item|items', 'greeting': 'Good morning' }
+      json: { 'plural_test': 'item|items', 'greeting': 'Good morning', 'plural_test_replace': 'one :thing|many :things' }
     },
     es: {
       php: { 'hello': 'Hola :name!', 'welcome': 'Bienvenido' },
@@ -47,10 +47,8 @@ describe('Svelte Lingua Bindings', () => {
   });
   
   test('svelte transChoice correctly replaces placeholders and handles plural form', () => {
-    mockLinguaData.translations.en.json.plural_test_replace = 'one :thing|many :things';
     setLingua('en', mockLinguaData);
     expect(transChoice('plural_test_replace', 5, { thing: 'widget' })).toBe('many widgets');
-    delete mockLinguaData.translations.en.json.plural_test_replace; // Clean up
   });
 
   test('svelte translations react to changes in currentLocale via setLingua', () => {
@@ -88,5 +86,10 @@ describe('Svelte Lingua Bindings', () => {
   test('svelte transChoice returns key if key does not exist for pluralization', () => {
     setLingua('en', mockLinguaData);
     expect(transChoice('non_existent_plural_key', 5)).toBe('non_existent_plural_key');
+  });
+
+  test('svelte __ is an alias for trans', () => {
+    setLingua('en', mockLinguaData);
+    expect(__('welcome')).toBe('Welcome');
   });
 });

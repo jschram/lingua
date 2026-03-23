@@ -5,8 +5,18 @@ import { LinguaProvider, useLingua } from './index.jsx';
 const mockLinguaData = {
   translations: {
     en: {
-      php: { 'hello': 'Hello :name!', 'welcome': 'Welcome' },
-      json: { 'plural_test': 'apple|apples' }
+      php: {
+          'hello': 'Hello :name!',
+          'welcome': 'Welcome',
+          'sidebar': {
+            'dashboard': 'Dashboard',
+            'reservations': 'Reservations',
+            'activities': 'Activities',
+            'settings': 'Settings',
+            'logout': 'Logout',
+          }
+      },
+      json: { 'plural_test': 'apple|apples', 'plural_test_replace': 'one :item|many :items' }
     },
     es: {
       php: { 'hello': 'Hola :name!', 'welcome': 'Bienvenido'},
@@ -27,6 +37,16 @@ const TestComponent = ({ translationKey, replace, choiceKey, choiceCount, choice
   );
 };
 
+const TestComponentWithAlias = ({ translationKey }) => {
+  const { __ } = useLingua();
+  return <p data-testid="alias">{__(translationKey)}</p>;
+};
+
+const ComponentOutsideProvider = () => {
+  useLingua();
+  return null;
+};
+
 describe('React Lingua Bindings', () => {
   test('trans function correctly translates a simple key', () => {
     render(
@@ -35,6 +55,15 @@ describe('React Lingua Bindings', () => {
       </LinguaProvider>
     );
     expect(screen.getByTestId('trans').textContent).toBe('Welcome');
+  });
+
+  test('trans function correctly translates a key with nested structure', () => {
+    render(
+      <LinguaProvider locale="en" Lingua={mockLinguaData}>
+        <TestComponent translationKey="sidebar.dashboard" />
+      </LinguaProvider>
+    );
+    expect(screen.getByTestId('trans').textContent).toBe('Dashboard');
   });
 
   test('trans function correctly replaces placeholders', () => {
@@ -63,16 +92,14 @@ describe('React Lingua Bindings', () => {
     );
     expect(screen.getByTestId('transChoice').textContent).toBe('apples');
   });
-  
+
   test('transChoice function correctly replaces placeholders and handles plural form', () => {
-    mockLinguaData.translations.en.json.plural_test_replace = 'one :item|many :items';
     render(
       <LinguaProvider locale="en" Lingua={mockLinguaData}>
         <TestComponent choiceKey="plural_test_replace" choiceCount={5} choiceReplacements={{ item: 'test_item' }} />
       </LinguaProvider>
     );
     expect(screen.getByTestId('transChoice').textContent).toBe('many test_items');
-    delete mockLinguaData.translations.en.json.plural_test_replace; // Clean up
   });
 
 
@@ -118,5 +145,24 @@ describe('React Lingua Bindings', () => {
       </LinguaProvider>
     );
     expect(screen.getByTestId('transChoice').textContent).toBe('missing_plural_key');
+  });
+
+  test('__ is an alias for trans', () => {
+    render(
+      <LinguaProvider locale="en" Lingua={mockLinguaData}>
+        <TestComponentWithAlias translationKey="welcome" />
+      </LinguaProvider>
+    );
+    expect(screen.getByTestId('alias').textContent).toBe('Welcome');
+  });
+
+  test('useLingua throws when used outside LinguaProvider', () => {
+    const originalError = console.error;
+    console.error = () => {};
+    try {
+      expect(() => render(<ComponentOutsideProvider />)).toThrow('useLingua must be used within a LinguaProvider');
+    } finally {
+      console.error = originalError;
+    }
   });
 });

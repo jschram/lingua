@@ -13,17 +13,17 @@
   "license": "MIT",
   "description": "",
   "devDependencies": {
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/react": "^16.3.0",
-    "@vitejs/plugin-react": "^4.5.0",
-    "jsdom": "^26.1.0",
-    "vite": "^6.3.5",
-    "vitest": "^3.1.4"
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.2",
+    "@vitejs/plugin-react": "^6.0.1",
+    "jsdom": "^29.0.1",
+    "vite": "^8.0.1",
+    "vitest": "^4.1.0"
   },
   "dependencies": {
     "@cyberwolf.studio/lingua-core": "^1.0.4",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   },
   "repository": {
     "type": "git",
